@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+.build/
+dist/
+build/
+out/
+*.log
+
+# Virtual envs
+.venv/
+venv/
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+
+# Local artifacts
+PacketWhiz_output/
+pwz_output/
+
+# Large captures (use Git LFS if you want to share samples)
+*.pcap
+*.pcapng
+*.cap
+*.gz

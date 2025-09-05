@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "packetwhiz"
+version = "0.1.0"
+description = "PacketWhiz — Lightweight, beginner-friendly, but powerful network forensics toolkit."
+readme = "README.md"
+requires-python = ">=3.8"
+authors = [{ name = "Omar Tamer & Farida Ismail" }]
+license = { text = "MIT" }
+dependencies = [
+  "pyshark",
+  "rich",
+  "jinja2",
+]
+
+[project.scripts]
+packetwhiz = "packetwhiz.__main__:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["packetwhiz*"]
+

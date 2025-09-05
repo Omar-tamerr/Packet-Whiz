@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# utils/report.py
 from __future__ import annotations
 
 import os
@@ -218,7 +217,7 @@ def _write_html(results: Dict[str, Any], outdir: str) -> str:
 
     return str(path)
 
-# ---------- public API ----------
+
 def generate_report(results: Dict[str, Any], outdir: str, fmt: str = "html") -> List[str]:
     """
     Generate a report into `outdir`.
@@ -232,11 +231,9 @@ def generate_report(results: Dict[str, Any], outdir: str, fmt: str = "html") -> 
     if fmt in ("html", "both"):
         written.append(_write_html(results, outdir))
     if fmt not in ("html", "txt", "both"):
-        # Fallback to html if someone passes "pdf" or anything else
         written.append(_write_html(results, outdir))
     return written
 
-# Backwards-compatible aliases expected by main.py
 def export_report(results: Dict[str, Any], outdir: str, fmt: str = "html") -> List[str]:
     return generate_report(results, outdir, fmt)
 
