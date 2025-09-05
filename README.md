@@ -1,6 +1,4 @@
-Here’s a clean, professional **README.md** you can copy-paste directly.
 
----
 
 # PacketWhiz — Network Forensics & Analysis (NFA)
 
