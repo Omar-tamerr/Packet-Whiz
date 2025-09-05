@@ -1,237 +1,224 @@
-
-
 # PacketWhiz — Network Forensics & Analysis (NFA)
 
-PacketWhiz is a lightweight, beginner-friendly toolkit for practical network forensics. It helps you analyze PCAPs/logs, summarize protocols, extract credentials and files, detect indicators, run CTF flag scans, and generate reports — with **no accidental writes** unless you explicitly choose to save.
+<p align="center">
+  <img alt="PacketWhiz main screen" src="packetwhiz/Img/main-page.png" width="900">
+</p>
 
-**Authors:** Omar Tamer & Farida Ismail
-**Version:** 0.1
-**Repository:** [https://github.com/Omar-tamerr/Packet-Whiz](https://github.com/Omar-tamerr/Packet-Whiz)
-
----
-
-## Features
-
-* **No-surprise I/O**: Nothing is written to disk unless you confirm (saving files or exporting a report).
-* **Protocol summary**: Clear detection with friendly assessment (e.g., clear-text HTTP vs HTTPS).
-* **Credentials & files**: Extract credentials; carve files with a preview-first flow.
-* **Indicators**: Beaconing, DNS tunneling, and other suspicious patterns (extensible analyzers).
-* **CTF helper**: Finds `FLAG{...}` in raw payloads and common encodings (URL/Base64/hex/rot13/gzip).
-* **PCAP utilities**: `--pcap-stats` (capinfos + protocol hierarchy) and `--talkers` (top src→dst\:port).
-* **Interactive shell**: Guided menu with **tab completion** and **persistent history**.
-* **Quality of life**: Auto-handle `.gz` PCAPs, fix common path typos, verbose timing logs.
+PacketWhiz is a lightweight, beginner-friendly, but powerful network forensics toolkit.  
+It parses PCAP/PCAPNG (optionally `.gz`) or simple logs, summarizes protocols, finds indicators,
+previews file carving, extracts credentials when possible, generates quick reports, and includes
+a guided interactive shell for non-experts.
 
 ---
 
-## Requirements
+## Highlights
 
-* **Python** 3.9+
-* **Optional (recommended)**:
-
-  * `tshark` and `capinfos` (Wireshark CLI) for richer payload extraction and stats
-
-PacketWhiz works without Wireshark CLIs but with reduced capabilities.
+- **Safe-by-default I/O** — nothing is written to disk unless you explicitly say so  
+- **Protocol summary** — quick view of HTTP/HTTPS/DNS/… counts + assessment notes  
+- **Indicators** — surface beaconing patterns, suspicious pairs, etc.  
+- **File extraction (preview-first)** — see what can be carved before saving  
+- **Credentials** — attempts clear-text credential recovery where applicable  
+- **CTF helper** — finds `FLAG{}` patterns with common encodings/containers  
+- **PCAP stats** — `capinfos` and `tshark` protocol hierarchy (read-only)  
+- **Top talkers** — most chatty `src → dst[:port]` pairs (read-only)  
+- **Reports** — `html` or `txt` reports you can hand to a teammate  
+- **Interactive shell** — tab completion + history (`~/.packetwhiz_history`)
 
 ---
 
 ## Installation
 
+### Requirements
+- Python **3.9+**
+- Optional CLI tools (only needed for some features):
+  - `tshark` (for protocol hierarchy & talkers)
+  - `capinfos` (Wireshark suite)
+
+### Quick Start (recommended)
+
 ```bash
-git clone https://github.com/Omar-tamerr/Packet-Whiz.git
-cd Packet-Whiz
+# From your project folder (or clone first):
 python3 -m venv .venv
 source .venv/bin/activate
-# No extra Python deps required for core features
+
+# Editable install
+pip install -e .
+
+# Run the tool (both forms are equivalent):
+packetwhiz --help
+# or
+python -m packetwhiz --help
 ```
+
+> Prefer a venv to keep dependencies clean.
 
 ---
 
-## Quick Start
+## Usage
 
-Protocol summary:
-
-```bash
-python3 main.py --pcap sample.pcap --protocols
-```
-
-Broad analysis without writing:
+### Common options
 
 ```bash
-python3 main.py --pcap sample.pcap --all --no-prompt
+packetwhiz --pcap sample.pcap --protocols
+packetwhiz --pcap sample.pcap --extract-files           # preview first; choose whether to save
+packetwhiz --pcap sample.pcap --indicators
+packetwhiz --pcap sample.pcap --pcap-stats              # capinfos + tshark protocol hierarchy
+packetwhiz --pcap sample.pcap --talkers                 # top src→dst[:port]
+packetwhiz --pcap sample.pcap --report html -o PacketWhiz_output
+packetwhiz --pcap sample.pcap --ctf
+packetwhiz --shell --pcap sample.pcap                   # guided shell for non-experts
 ```
 
-Interactive shell (tab completion, ↑/↓ history):
+### “Do a lot for me” run
 
 ```bash
-python3 main.py --pcap sample.pcap --shell
+packetwhiz --pcap sample.pcap --all --no-prompt
 ```
 
-Export a report (writes only because you asked to):
+What `--all` does: runs `--protocols --sessions --extract-creds --extract-files --indicators --ctf`.  
+It still **does not write to disk** unless you later choose to save or specify `--report`.
 
-```bash
-python3 main.py --pcap sample.pcap --protocols --report html -o PacketWhiz_output
-```
+### Zero-write safety
 
----
-
-## Command-Line Usage
-
-```
-packetwhiz [OPTIONS]
-
-Input:
-  --pcap PATH                Input .pcap/.pcapng (also accepts .gz)
-  --log PATH                 Input raw text log
-
-Features:
-  --protocols                Detect protocol distribution
-  --sessions                 Reconstruct sessions/conversations
-  --extract-creds            Extract credentials
-  --extract-files            Extract/carve files (preview first)
-  --indicators               Detect suspicious indicators
-  --pcap-stats               Show capinfos & tshark protocol hierarchy (read-only)
-  --talkers                  Show top talkers (src→dst:port) (read-only)
-  --ctf                      Find CTF flags (FLAG{...}) with common decoders
-  --report {html,txt,both}   Export report (writes to -o)
-
-Output & UX:
-  -o, --outdir DIR           Output folder when writing (default: PacketWhiz_output)
-  -q, --quiet                Less console output
-  -V, --verbose              Verbose mode + timing for key steps
-  --no-prompt                Never ask to save; skip writes unless --report is set
-  --no-writes                Force zero disk writes (or set PWZ_NO_WRITES=1)
-  --shell                    Interactive guided shell for non-experts
-
-Convenience:
-  --all                      Enable: protocols, sessions, extract-creds, extract-files, indicators, ctf
-
-Meta:
-  -h, --help                 Show help and exit
-  -v, --version              Show version and exit
-```
-
-### Useful examples
-
-```bash
-# Protocol summary with assessment
-python3 main.py --pcap web.pcap --protocols
-
-# Top talkers
-python3 main.py --pcap traffic.pcap --talkers
-
-# Creds + files (preview first; then optional save)
-python3 main.py --pcap http.cap --extract-creds --extract-files
-
-# CTF flags
-python3 main.py --pcap challenge.pcap --ctf
-
-# Text + HTML report
-python3 main.py --pcap case.pcap --protocols --indicators --report both -o Incident_2025-09-05
-```
-
-> Tip: Passing a `.gz` PCAP (e.g., `capture.pcap.gz`) is supported — PacketWhiz auto-decompresses to a temporary file for analysis.
+No writes occur unless you explicitly confirm saving, pass `--report`, or run “save now” in the shell.  
+You can hard-enforce no writes with `--no-writes` or `PWZ_NO_WRITES=1`.
 
 ---
 
 ## Interactive Shell
 
-Start the guided shell:
-
 ```bash
-python3 main.py --pcap sample.pcap --shell
+packetwhiz --shell --pcap sample.pcap
 ```
 
-Commands:
+<p align="center">
+  <img alt="Shell feature" src="packetwhiz/Img/shell-feature.png" width="900">
+</p>
 
-* `1` — PCAP stats (capinfos + tshark hierarchy)
-* `2` — Protocol summary
-* `3` — Top talkers (src→dst\:port)
-* `4` — Extract files (preview only)
-* `5` — Save files (choose folder)
-* `6` — Credentials
-* `7` — Indicators
-* `8` — CTF flags
-* `r` — Generate report (html/txt/both)
-* `h` — Help
-* `q` — Quit
+You’ll see options like:
 
-**Tab completion** suggests commands; **history** is saved to `~/.packetwhiz_history`.
+```
+1) PCAP stats (capinfos + tshark hierarchy)  — no writes
+2) Protocol summary
+3) Top talkers (src→dst:port)                — no writes
+4) Extract files (preview)
+5) Save files now
+6) Credentials
+7) Indicators
+8) CTF flags
+r) Generate report (html/txt/both)
+h) Help     q) Quit
+```
+
+* **Tab completion** for commands (e.g., `pro…` → `protocols`)  
+* **Command history** is saved to `~/.packetwhiz_history`  
+* File extraction is **preview-first**; saving asks for a destination folder.
+
+---
+
+## Visuals
+
+### Protocols
+<p align="center">
+  <img alt="Protocols feature" src="packetwhiz/Img/protocols-feature.png" width="900">
+</p>
+
+### Indicators (beaconing, suspicious pairs, etc.)
+<p align="center">
+  <img alt="Indicators" src="packetwhiz/Img/indicators.png" width="900">
+</p>
+
+### Top Talkers
+<p align="center">
+  <img alt="Top talkers" src="packetwhiz/Img/talkers.png" width="900">
+</p>
+
+### Shell Example (command 1)
+<p align="center">
+  <img alt="Shell command example" src="packetwhiz/Img/shell-command-one.png" width="900">
+</p>
 
 ---
 
 ## Reports
 
-* Built-in **HTML** and **TXT** report generators (`utils/report.py`).
-* Sections: Protocols, Credentials, Files, Indicators, CTF Flags.
-* Only created if you explicitly run with `--report` (CLI) or `r` (shell).
+Generate HTML or text reports containing whatever you ran in the session:
+
+```bash
+packetwhiz --pcap sample.pcap --protocols --indicators --report both -o PacketWhiz_output
+```
+
+Or from the shell: `r` → choose `html`, `txt`, or `both`, then choose the output folder.
 
 ---
 
-## Safety: Explicit Writes Only
+## Useful Examples
 
-* Analysis doesn’t create any folders or files by default.
-* Disk writes happen only when you:
+```bash
+# 1) Quick protocol picture + talkers (read-only)
+packetwhiz --pcap corp_traffic.pcap --protocols --talkers
 
-  * save carved files (prompt or shell `5`)
-  * export a report (`--report` / shell `r`)
-* `--no-prompt` ensures non-interactive, read-only behavior.
-* `--no-writes` or `PWZ_NO_WRITES=1` enforces zero writes.
+# 2) Preview then save carved files
+packetwhiz --pcap web_no_tls.pcap --extract-files
+# ... if you see interesting hits, choose to save and pick an output folder
 
----
+# 3) Indicators + simple text report
+packetwhiz --pcap beaconing_slice.pcap --indicators --report txt -o PacketWhiz_output
 
-## Project Structure
+# 4) CTF mode
+packetwhiz --pcap ctf.pcap --ctf
 
+# 5) All analyses (no writes), then decide
+packetwhiz --pcap case1.pcap --all --no-prompt
 ```
-Packet-Whiz/
-├── main.py
-├── analyzers/
-│   ├── protocol.py         # detect_protocols(), reconstruct_sessions()
-│   ├── creds.py            # extract_credentials()
-│   ├── files.py            # extract_files()
-│   └── indicators.py       # find_indicators()
-├── parser/
-│   ├── pcap_parser.py      # load/parse pcap
-│   └── log_parcer.py       # load/parse logs
-└── utils/
-    ├── flag_finder.py      # find_flags() / CTF helper
-    └── report.py           # generate_report() (HTML/TXT)
-```
-
-`main.py` dynamically imports these functions. If a module is missing, it prints a clear message and continues when possible.
 
 ---
 
 ## Troubleshooting
 
-* **PCAP not found**
-  We try `./`, `../`, typo fix `witp→with`, and `.gz`. Verify the path and extension.
-* **`capinfos` / `tshark` missing**
-  Install Wireshark CLI tools (e.g., `sudo apt install wireshark-common` on Debian/Ubuntu).
-* **No files/creds detected**
-  Some captures won’t contain extractable artifacts. Start with `--protocols` and `--pcap-stats`.
-* **CTF flags not found**
-  The helper checks multiple encodings. If still nothing, investigate with `--talkers` and targeted protocol tools.
+**“parser.pcap_parser function not found.”**  
+Make sure you installed the package (not just running a stray script). The source layout is a proper package:
+
+```
+packetwhiz/
+  __main__.py
+  analyzers/
+  parser/
+  utils/
+```
+
+Running `pip install -e .` should expose the `packetwhiz` module & CLI.
+
+**“File not found” with slight typos or `.gz`**  
+PacketWhiz tries common path fixes (parent folder, `.gz` partner, and some typo healing like `witp→with`).  
+If you pass `x.pcap.gz`, it will transparently decompress to a temp file.
+
+**Need Wireshark CLI tools**  
+Install `tshark` and `capinfos` if you want protocol hierarchy and stats:  
+- Debian/Ubuntu: `sudo apt install tshark`  
+- macOS (Homebrew): `brew install wireshark`
+
+---
+
+## Authors & Collaboration
+
+**PacketWhiz** is a collaborative project by:
+
+* **Omar Tamer** ([@Omar-tamerr](https://github.com/Omar-tamerr)) — co-founder, project lead, CLI & shell UX, analyzers integration, and reporting.
+* **Farida Ismail** ([@faridaaismaill12](https://github.com/faridaaismaill12)) — co-founder, **network forensics expert**, design collaborator, and analyzer workflows.
+
+If you use PacketWhiz in a write-up, class, or video, please credit both authors.
 
 ---
 
 ## Contributing
 
-Contributions are welcome! Please:
-
-1. Keep disk-write behavior explicit and user-driven.
-2. Keep analyzers modular with simple function signatures.
-3. Add concise docstrings and example usage in PRs.
-4. Prefer zero external Python dependencies; rely on system tools when reasonable.
+PRs are welcome!  
+Before submitting, please run your changes locally and keep the CLI safe-by-default (no unintended writes).
 
 ---
 
 ## License
 
-See [LICENSE](./LICENSE).
-
----
-
-## Credits
-
-Thanks to the Wireshark community for `tshark` and `capinfos`, which make practical network forensics accessible.
+MIT — see `LICENSE`.
 
