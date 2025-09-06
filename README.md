@@ -1,6 +1,6 @@
 # PacketWhiz — Network Forensics & Analysis (NFA)
 
-[![PyPI version](https://img.shields.io/pypi/v/packetwhiz-nfa.svg)](https://pypi.org/project/packetwhiz-nfa/)  
+[![PyPI version](https://img.shields.io/pypi/v/packetwhiz-nfa.svg)](https://pypi.org/project/packetwhiz-nfa/) &nbsp;
 [![Python versions](https://img.shields.io/pypi/pyversions/packetwhiz-nfa.svg)](https://pypi.org/project/packetwhiz-nfa/)
 
 <p align="center">
