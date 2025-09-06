@@ -1,10 +1,11 @@
+
 # PacketWhiz — Network Forensics & Analysis (NFA)
 
 <p align="center">
   <img alt="PacketWhiz main screen" src="packetwhiz/Img/main-page.png" width="900">
 </p>
 
-PacketWhiz is a lightweight, beginner-friendly, but powerful network forensics toolkit.  
+PacketWhiz is a lightweight, beginner-friendly, but powerful network forensics toolkit.
 It parses PCAP/PCAPNG (optionally `.gz`) or simple logs, summarizes protocols, finds indicators,
 previews file carving, extracts credentials when possible, generates quick reports, and includes
 a guided interactive shell for non-experts.
@@ -13,36 +14,34 @@ a guided interactive shell for non-experts.
 
 ## Highlights
 
-- **Safe-by-default I/O** — nothing is written to disk unless you explicitly say so  
-- **Protocol summary** — quick view of HTTP/HTTPS/DNS/… counts + assessment notes  
-- **Indicators** — surface beaconing patterns, suspicious pairs, etc.  
-- **File extraction (preview-first)** — see what can be carved before saving  
-- **Credentials** — attempts clear-text credential recovery where applicable  
-- **CTF helper** — finds `FLAG{}` patterns with common encodings/containers  
-- **PCAP stats** — `capinfos` and `tshark` protocol hierarchy (read-only)  
-- **Top talkers** — most chatty `src → dst[:port]` pairs (read-only)  
-- **Reports** — `html` or `txt` reports you can hand to a teammate  
-- **Interactive shell** — tab completion + history (`~/.packetwhiz_history`)
+* **Safe-by-default I/O** — nothing is written to disk unless you explicitly say so
+* **Protocol summary** — quick view of HTTP/HTTPS/DNS/… counts + assessment notes
+* **Indicators** — surface beaconing patterns, suspicious pairs, etc.
+* **File extraction (preview-first)** — see what can be carved before saving
+* **Credentials** — attempts clear-text credential recovery where applicable
+* **CTF helper** — finds `FLAG{}` patterns with common encodings/containers
+* **PCAP stats** — `capinfos` and `tshark` protocol hierarchy (read-only)
+* **Top talkers** — most chatty `src → dst[:port]` pairs (read-only)
+* **Reports** — `html` or `txt` reports you can hand to a teammate
+* **Interactive shell** — tab completion + history (`~/.packetwhiz_history`)
 
 ---
 
 ## Installation
 
 ### Requirements
-- Python **3.9+**
-- Optional CLI tools (only needed for some features):
-  - `tshark` (for protocol hierarchy & talkers)
-  - `capinfos` (Wireshark suite)
 
-### Quick Start (recommended)
+* Python **3.9+**
+* Optional CLI tools (only needed for some features):
+
+  * `tshark` (for protocol hierarchy & talkers)
+  * `capinfos` (Wireshark suite)
+
+### Quick Start
 
 ```bash
-# From your project folder (or clone first):
-python3 -m venv .venv
-source .venv/bin/activate
-
-# Editable install
-pip install -e .
+# Install from PyPI
+pip install packetwhiz-nfa
 
 # Run the tool (both forms are equivalent):
 packetwhiz --help
@@ -50,7 +49,7 @@ packetwhiz --help
 python -m packetwhiz --help
 ```
 
-> Prefer a venv to keep dependencies clean.
+> Prefer a venv (`python3 -m venv .venv && source .venv/bin/activate`) to keep dependencies clean.
 
 ---
 
@@ -75,12 +74,12 @@ packetwhiz --shell --pcap sample.pcap                   # guided shell for non-e
 packetwhiz --pcap sample.pcap --all --no-prompt
 ```
 
-What `--all` does: runs `--protocols --sessions --extract-creds --extract-files --indicators --ctf`.  
+What `--all` does: runs `--protocols --sessions --extract-creds --extract-files --indicators --ctf`.
 It still **does not write to disk** unless you later choose to save or specify `--report`.
 
 ### Zero-write safety
 
-No writes occur unless you explicitly confirm saving, pass `--report`, or run “save now” in the shell.  
+No writes occur unless you explicitly confirm saving, pass `--report`, or run “save now” in the shell.
 You can hard-enforce no writes with `--no-writes` or `PWZ_NO_WRITES=1`.
 
 ---
@@ -110,8 +109,8 @@ r) Generate report (html/txt/both)
 h) Help     q) Quit
 ```
 
-* **Tab completion** for commands (e.g., `pro…` → `protocols`)  
-* **Command history** is saved to `~/.packetwhiz_history`  
+* **Tab completion** for commands (e.g., `pro…` → `protocols`)
+* **Command history** is saved to `~/.packetwhiz_history`
 * File extraction is **preview-first**; saving asks for a destination folder.
 
 ---
@@ -119,21 +118,25 @@ h) Help     q) Quit
 ## Visuals
 
 ### Protocols
+
 <p align="center">
   <img alt="Protocols feature" src="packetwhiz/Img/protocols-feature.png" width="900">
 </p>
 
 ### Indicators (beaconing, suspicious pairs, etc.)
+
 <p align="center">
   <img alt="Indicators" src="packetwhiz/Img/indicators.png" width="900">
 </p>
 
 ### Top Talkers
+
 <p align="center">
   <img alt="Top talkers" src="packetwhiz/Img/talkers.png" width="900">
 </p>
 
 ### Shell Example (command 1)
+
 <p align="center">
   <img alt="Shell command example" src="packetwhiz/Img/shell-command-one.png" width="900">
 </p>
@@ -176,27 +179,18 @@ packetwhiz --pcap case1.pcap --all --no-prompt
 
 ## Troubleshooting
 
-**“parser.pcap_parser function not found.”**  
-Make sure you installed the package (not just running a stray script). The source layout is a proper package:
+**“parser.pcap\_parser function not found.”**
+Make sure you installed the package from PyPI and not just a stray script.
 
-```
-packetwhiz/
-  __main__.py
-  analyzers/
-  parser/
-  utils/
-```
-
-Running `pip install -e .` should expose the `packetwhiz` module & CLI.
-
-**“File not found” with slight typos or `.gz`**  
-PacketWhiz tries common path fixes (parent folder, `.gz` partner, and some typo healing like `witp→with`).  
+**“File not found” with slight typos or `.gz`**
+PacketWhiz tries common path fixes (parent folder, `.gz` partner, and some typo healing like `witp→with`).
 If you pass `x.pcap.gz`, it will transparently decompress to a temp file.
 
-**Need Wireshark CLI tools**  
-Install `tshark` and `capinfos` if you want protocol hierarchy and stats:  
-- Debian/Ubuntu: `sudo apt install tshark`  
-- macOS (Homebrew): `brew install wireshark`
+**Need Wireshark CLI tools**
+Install `tshark` and `capinfos` if you want protocol hierarchy and stats:
+
+* Debian/Ubuntu: `sudo apt install tshark`
+* macOS (Homebrew): `brew install wireshark`
 
 ---
 
@@ -213,7 +207,7 @@ If you use PacketWhiz in a write-up, class, or video, please credit both authors
 
 ## Contributing
 
-PRs are welcome!  
+PRs are welcome!
 Before submitting, please run your changes locally and keep the CLI safe-by-default (no unintended writes).
 
 ---
