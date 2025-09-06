@@ -4,7 +4,7 @@
 [![Python versions](https://img.shields.io/pypi/pyversions/packetwhiz-nfa.svg)](https://pypi.org/project/packetwhiz-nfa/)
 
 <p align="center">
-  <img alt="PacketWhiz main screen" src="https://raw.githubusercontent.com/Omar-tamerr/packetwhiz/main/packetwhiz/Img/main-page.png" width="900">
+  <img alt="PacketWhiz main screen" src="packetwhiz/Img/main-page.png" width="900">
 </p>
 
 PacketWhiz is a lightweight, beginner-friendly, but powerful network forensics toolkit.
